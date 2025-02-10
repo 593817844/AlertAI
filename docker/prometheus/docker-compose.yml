@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./alert.rules:/etc/prometheus/alert.rules
+      - ./prometheus_data:/prometheus
+    ports:
+      - "8848:9090"
+    networks:
+      - monitoring
+    restart: unless-stopped
+
+  alertmanager:
+    image: prom/alertmanager:latest
+    container_name: alertmanager
+    volumes:
+      - ./alertmanager.yml:/etc/alertmanager/alertmanager.yml
+    ports:
+      - "3306:9093"
+    networks:
+      - monitoring
+    restart: unless-stopped
+
+  node-exporter:
+    image: prom/node-exporter:latest
+    container_name: node-exporter
+    ports:
+      - "9100:9100"
+    networks:
+      - monitoring
+    volumes:
+      - /proc:/host/proc:ro       # 将宿主机的 /proc 挂载到容器的 /host/proc
+      - /sys:/host/sys:ro         # 将宿主机的 /sys 挂载到容器的 /host/sys
+    pid: "host"                     # 使用宿主机的 PID 名称空间
+    restart: unless-stopped
+
+networks:
+  monitoring:
+    driver: bridge

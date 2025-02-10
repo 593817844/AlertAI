@@ -1,0 +1,19 @@
+groups:
+  - name: example-alerts
+    rules:
+      - alert: HighCpuUsage
+        expr: (100 - (avg(rate(node_cpu_seconds_total{mode="idle"}[1m])) by (instance) * 100)) > 60
+        for: 10s
+        labels:
+          severity: critical
+        annotations:
+          summary: "CPU usage on {{ $labels.instance }} is above 60%"
+
+      - alert: HighMemoryUsage
+        expr: (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes * 100) < 40
+        for: 10s
+        labels:
+          severity: critical
+        annotations:
+          summary: "Memory usage on {{ $labels.instance }} is above 60%"
+
