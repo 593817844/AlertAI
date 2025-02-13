@@ -1,9 +1,5 @@
 from tortoise import models, fields
 
-# models.py
-
-from tortoise import models, fields
-
 class Alert(models.Model):
     # 字段列表
     id = fields.CharField(pk=True, max_length=255, description='唯一ID')
@@ -21,10 +17,9 @@ class Alert(models.Model):
         description = "告警信息"
 
     def __repr__(self):
-        return f"Alert (fingerprint={self.fingerprint}, status={self.status})"
+        return f"Alert (fingerprint={self.id}, status={self.status})"
 
     __str__ = __repr__
-
 
 
 

@@ -20,7 +20,7 @@ TORTOISE_ORM = {
     'apps': {  # 默认所在的应用目录
         'models': {  # 数据模型的分组名
             # 'models': ['applicaton.apps.users.models', 'aerich.models'],  # 模型所在目录文件的导包路径[字符串格式]
-            'models': ['apps.alerts.models'],
+            'models': ['apps.alerts.models','apps.systeminfo.models'],
             'default_connection': 'default',  # 上一行配置中的模型列表的默认连接配置
         }
     },

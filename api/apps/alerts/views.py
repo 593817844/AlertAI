@@ -1,9 +1,9 @@
-from fastapi import APIRouter, HTTPException, status, Request
+from fastapi import APIRouter
 from . import scheams, models
 from datetime import datetime
 from utils import logs
 import os
-
+from typing import List
 logger = logs.getLogger(os.environ.get('APP_NAME'))
 
 app = APIRouter()
@@ -68,3 +68,11 @@ async def receive_alert(data: scheams.WebhookData):
 
     return {"message": "Alert received successfully"}
 
+@app.get("/alert/all",response_model=List[scheams.RecordAlert])
+async def alertall():
+    all = await models.Alert.all()
+    for alert in all:
+        alert.startsAt = alert.startsAt.isoformat() if isinstance(alert.startsAt, datetime) else alert.startsAt
+        alert.endsAt = alert.endsAt.isoformat() if isinstance(alert.endsAt, datetime) else alert.endsAt
+    return all
+    

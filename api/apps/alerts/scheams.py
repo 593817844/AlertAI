@@ -42,4 +42,5 @@ class RecordAlert(BaseModel):
     fingerprint: str
     duration: Optional[int] = None
 
-
+    class Config:
+        orm_mode = True  # 允许从 ORM 对象中读取数据
