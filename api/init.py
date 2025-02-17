@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 from tortoise.contrib.fastapi import register_tortoise
 from apps.alerts.views import app as alert_app
 from apps.systeminfo.views import app as system_app
+from apps.ai.views import app as ai_app
 # from .apps.users.views import app as users_app
 import settings
 # from .utils import middleware, exceptions, redis_tools
@@ -38,6 +39,7 @@ def create_app() -> FastAPI:
     # 注册各个分组应用中的视图接口代码到App应用对象中
     app.include_router(alert_app)
     app.include_router(system_app)
+    app.include_router(ai_app)
     # app.include_router(alert_app, prefix='/alertmamager')  # prefix url路径前缀，
 
     # 注册中间件函数

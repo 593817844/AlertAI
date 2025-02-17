@@ -6,6 +6,9 @@ groups:
         for: 10s
         labels:
           severity: critical
+          project: "{{ $labels.project }}"           # 必须在规则中定义
+          app: "{{ $labels.app }}"            # 必须在规则中定义
+          ip: "{{ $labels.instance }}"  # 必须在规则中定义
         annotations:
           summary: "CPU usage on {{ $labels.instance }} is above 60%"
 
