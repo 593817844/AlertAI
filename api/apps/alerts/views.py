@@ -1,9 +1,10 @@
-from fastapi import APIRouter
+from fastapi import APIRouter,exceptions
 from . import scheams, models
 from datetime import datetime
 from utils import logs
 import os
 from typing import List
+
 logger = logs.getLogger(os.environ.get('APP_NAME'))
 
 app = APIRouter()
@@ -12,10 +13,8 @@ def generate_unique_id(var1, var2):
     return abs(hash((var1, var2))) 
 
 @app.post("/alert")
-# async def receive_alert(item: Dict[str, Any]):
 async def receive_alert(data: scheams.WebhookData):
     try:
-        print(f"输入原始数据\n{data}")
         logger.info(f"输入原始数据\n{data}")
         for alert in data.alerts:
             starts_at = datetime.fromisoformat(alert.startsAt[:-1])
@@ -49,22 +48,23 @@ async def receive_alert(data: scheams.WebhookData):
                 print("resolved数据成功更新")
             else:
                 print("输入格式不正确")
-            # 查询所有的 Alert 记录
+        # 查询所有的 Alert 记录
         alerts = await models.Alert.all()
 
         # 遍历并详细打印每一条记录
-        for alert in alerts:
-            print(f"id: {alert.id}")
-            print(f"Fingerprint: {alert.fingerprint}")
-            print(f"Status: {alert.status}")
-            print(f"Labels: {alert.labels}")
-            print(f"Annotations: {alert.annotations}")
-            print(f"StartsAt: {alert.startsAt}")
-            print(f"EndsAt: {alert.endsAt}")
-            print(f"Duration: {alert.duration}")
-            print("-" * 50)  # 分隔符，增加可读性
+        # for alert in alerts:
+        #     print(f"id: {alert.id}")
+        #     print(f"Fingerprint: {alert.fingerprint}")
+        #     print(f"Status: {alert.status}")
+        #     print(f"Labels: {alert.labels}")
+        #     print(f"Annotations: {alert.annotations}")
+        #     print(f"StartsAt: {alert.startsAt}")
+        #     print(f"EndsAt: {alert.endsAt}")
+        #     print(f"Duration: {alert.duration}")
+        #     print("-" * 50)  # 分隔符，增加可读性
     except Exception as e:
-        print(f"An error occurred: {e}")
+        logger.warn(f"An error occurred: {e}")
+        raise exceptions.HTTPException
 
     return {"message": "Alert received successfully"}
 

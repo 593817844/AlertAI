@@ -17,7 +17,7 @@ async def alertai(project: str):
     # 获取系统信息
     systeminfo = await SystemInfo.filter(project=project).first()
     if not systeminfo:
-        return "未找到对应的系统信息"
+        raise HTTPException(status_code=500,detail="未找到对应的系统信息")
     if alerts:
         async with httpx.AsyncClient(timeout=httpx.Timeout(120)) as client:
             data={
@@ -33,5 +33,4 @@ async def alertai(project: str):
             else:
                 raise HTTPException(status_code=response.status_code, detail="Request failed")
     else:
-        return "project中没找到firing相关的告警"
-    return "Request failed"
+        raise HTTPException(status_code=500,detail="project中没找到firing相关的告警")

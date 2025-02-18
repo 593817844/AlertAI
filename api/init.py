@@ -5,10 +5,8 @@ from tortoise.contrib.fastapi import register_tortoise
 from apps.alerts.views import app as alert_app
 from apps.systeminfo.views import app as system_app
 from apps.ai.views import app as ai_app
-# from .apps.users.views import app as users_app
 import settings
-# from .utils import middleware, exceptions, redis_tools
-from utils import middleware
+from utils import middleware,exceptions
 
 def create_app() -> FastAPI:
     """工厂函数：创建App对象"""
@@ -20,6 +18,11 @@ def create_app() -> FastAPI:
         summary=os.environ.get('APP_SUMMARY'),
         description=os.environ.get('APP_DESCRIPTION'),
         version=os.environ.get('APP_VERSION'),
+        # 注册全局异常处理函数
+        exception_handlers={
+            exceptions.HTTPException: exceptions.global_http_exception_handler,
+            exceptions.RequestValidationError: exceptions.global_request_exception_handler,
+        }
     )
 
     # 把tortoise-orm注册到App应用对象中

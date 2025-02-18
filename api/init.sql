@@ -8,3 +8,8 @@ CREATE TABLE alerts (
     endsAt DATETIME,                        -- 告警结束时间字段，可以为空
     duration INT                           -- 持续时间字段，可以为空
 );
+CREATE TABLE systeminfo (
+    id SERIAL PRIMARY KEY,  -- 使用 SERIAL 自动生成唯一 ID
+    project VARCHAR(255) NOT NULL,  -- 项目名称，最大长度为 255
+    architecture TEXT  -- 系统架构信息
+);
