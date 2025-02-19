@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  alert-api:
+    image: alert-api:latest  # 替换为你的镜像名称和版本
+    container_name: alert-api
+    ports:
+      - "8000:8000"  # 将容器的 8000 端口映射到宿主机的 8000 端口
+    networks:
+      - alert-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000"]  # 健康检查路径，根据你的应用调整
+      interval: 30s  # 每 30 秒检查一次
+      timeout: 10s   # 每次检查超时时间为 10 秒
+      retries: 3     # 如果连续 3 次失败，则认为服务不健康
+      start_period: 40s  # 服务启动后 40 秒内不进行健康检查，避免启动时误判
+
+networks:
+  alert-network:
+    name: alert-network
+    driver: bridge
+    external: true
