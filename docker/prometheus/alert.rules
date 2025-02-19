@@ -2,7 +2,7 @@ groups:
   - name: example-alerts
     rules:
       - alert: HighCpuUsage
-        expr: (100 - (avg(rate(node_cpu_seconds_total{mode="idle"}[1m])) by (instance) * 100)) > 60
+        expr: (100 - (avg by (instance,app,project) (rate(node_cpu_seconds_total{mode="idle"}[1m])) * 100)) > 60
         for: 10s
         labels:
           severity: critical
