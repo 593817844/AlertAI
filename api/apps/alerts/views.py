@@ -49,8 +49,7 @@ async def receive_alert(data: scheams.WebhookData):
             else:
                 print("输入格式不正确")
         # 查询所有的 Alert 记录
-        alerts = await models.Alert.all()
-
+        #alerts = await models.Alert.all()
         # 遍历并详细打印每一条记录
         # for alert in alerts:
         #     print(f"id: {alert.id}")
@@ -68,11 +67,13 @@ async def receive_alert(data: scheams.WebhookData):
 
     return {"message": "Alert received successfully"}
 
-@app.get("/alert/all",response_model=List[scheams.RecordAlert])
-async def alertall():
-    all = await models.Alert.all()
-    for alert in all:
+@app.get("/alert",response_model=List[scheams.RecordAlert])
+async def GetAlerts(page: int =1 ,size: int =10):
+    offset = (page - 1) * size
+    # 获取分页数据
+    all_alerts = await models.Alert.all().offset(offset).limit(size)
+    for alert in all_alerts:
         alert.startsAt = alert.startsAt.isoformat() if isinstance(alert.startsAt, datetime) else alert.startsAt
         alert.endsAt = alert.endsAt.isoformat() if isinstance(alert.endsAt, datetime) else alert.endsAt
-    return all
+    return all_alerts
     
