@@ -13,3 +13,13 @@ CREATE TABLE systeminfo (
     project VARCHAR(255) NOT NULL,  -- 项目名称，最大长度为 255
     architecture TEXT  -- 系统架构信息
 );
+CREATE TABLE user_info (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    username VARCHAR(255) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    mobile VARCHAR(15) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    created_time DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,
+    deleted_time DATETIME NULL
+);

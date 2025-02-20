@@ -77,3 +77,16 @@ async def GetAlerts(page: int =1 ,size: int =10):
         alert.endsAt = alert.endsAt.isoformat() if isinstance(alert.endsAt, datetime) else alert.endsAt
     return all_alerts
     
+    
+@app.delete("/alert/{id}")
+async def DeleteAlert(id: int):
+    alert = await models.Alert.filter(id=id).first()
+    if not alert:
+        raise exceptions.HTTPException(status_code=400,detail="用户不存在")
+    alert.delete()
+        # 3. 返回响应
+    return {
+        "code": status.HTTP_200_OK,
+        "err_msg": "用户删除成功",
+        "status": "Success"
+    }
