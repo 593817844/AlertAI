@@ -19,10 +19,8 @@ class UserRegisterRequest(BaseModel):
 
         return self
 
-
-class BaseResponse(BaseModel):
-    code: int = fields.Field(description='状态码')
-    err_msg: str = fields.Field(description='响应结果提示')
-    status: str = fields.Field(description='状态文本提示')
+class LoginRequest(BaseModel):
+    username: str
+    password: str
 
 

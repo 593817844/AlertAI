@@ -1,12 +1,13 @@
-from fastapi import APIRouter, HTTPException, status, Request,Query
+from fastapi import APIRouter, HTTPException, status, Request,Query,Depends
 from . import scheams, models
-from utils.jwt_tool import JwtToken
-
+from utils.jwt_tool import JwtToken,get_current_user
+from utils.tools import Hashing
+from fastapi.security import OAuth2PasswordRequestForm
 
 app = APIRouter()
 
 
-@app.post('/register')
+@app.post('/user/register')
 async def register(request: Request, user_info: scheams.UserRegisterRequest):
     """处理用户注册请求"""
     # 1. 验证用户账号是否重复注册[mobile]
@@ -16,7 +17,7 @@ async def register(request: Request, user_info: scheams.UserRegisterRequest):
 
     # 3. 添加用户数据
     user = await models.User.create(
-        username=user_info.mobile,
+        username=user_info.username,
         password=user_info.password,
         mobile=user_info.mobile,
         email=user_info.email
@@ -33,12 +34,12 @@ async def register(request: Request, user_info: scheams.UserRegisterRequest):
         'status': 'Success',
         'token': JwtToken.create_token({
             'id': user.id
-        }),
+        })
     }
 
 
 @app.delete('/user/{user_id}')
-async def delete_user(request: Request, user_id: int):
+async def delete_user(request: Request, user_id: int,current_user: dict = Depends(get_current_user)):
     """处理用户删除请求（硬删除）"""
     # 1. 验证用户是否存在
     user = await models.User.filter(id=user_id).first()
@@ -55,8 +56,8 @@ async def delete_user(request: Request, user_id: int):
         "status": "Success"
     }
 
-@app.get('/users')
-async def get_users(request: Request, page: int = Query(1, alias='page', ge=1), size: int = Query(10, alias='size', ge=1, le=100)):
+@app.get('/user')
+async def get_users(request: Request, page: int = Query(1, alias='page', ge=1), size: int = Query(10, alias='size', ge=1, le=100),current_user: dict = Depends(get_current_user)):
     """查询所有用户，并支持分页"""
     # 计算分页的偏移量
     offset = (page - 1) * size
@@ -78,8 +79,8 @@ async def get_users(request: Request, page: int = Query(1, alias='page', ge=1), 
         "size": size
     }
 
-@app.patch('/update_user/{user_id}')
-async def update_user(request: Request, user_id: int, user_info: scheams.UserRegisterRequest):
+@app.patch('/user/{user_id}')
+async def update_user(request: Request, user_id: int, user_info: scheams.UserRegisterRequest,current_user: dict = Depends(get_current_user)):
     """更新用户信息"""
     # 1. 验证用户是否存在
     user = await models.User.filter(id=user_id).first()
@@ -115,7 +116,35 @@ async def update_user(request: Request, user_id: int, user_info: scheams.UserReg
 
 
 
-@app.get('/login')
-async def login():
-
-    return {'methods': 'login'}
+@app.post('/user/login')
+async def login(lr: scheams.LoginRequest):
+    print(lr)
+    user = await models.User.filter(username=lr.username).first()
+    
+    if not user:
+        raise HTTPException(status_code=200,detail="找不到该用户")
+    result = Hashing().verify(lr.password, user.password)
+    if not result:
+        raise HTTPException(status_code=200,detail="密码不正确")
+    # 4. 返回响应
+    return {
+        "code": status.HTTP_200_OK,
+        "err_msg": "用户登陆成功",
+        "status": "Success",
+        "token": JwtToken.create_token({
+            'id': user.id
+        })
+    }
+    
+@app.post('/token')
+async def login(form_data: OAuth2PasswordRequestForm = Depends()):
+    user = await models.User.filter(username=form_data.username).first()
+    
+    if not user:
+        raise HTTPException(status_code=200,detail="找不到该用户")
+    result = Hashing().verify(form_data.password, user.password)
+    if not result:
+        raise HTTPException(status_code=200,detail="密码不正确")
+    # 4. 返回响应
+    access_token = JwtToken.create_token({'id': user.id})
+    return {"access_token": access_token, "token_type": "bearer"}

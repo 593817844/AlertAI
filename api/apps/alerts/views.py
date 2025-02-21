@@ -1,7 +1,8 @@
-from fastapi import APIRouter,exceptions
+from fastapi import APIRouter,exceptions,status,Depends
 from . import scheams, models
 from datetime import datetime
 from utils import logs
+from utils.jwt_tool import get_current_user
 import os
 from typing import List
 
@@ -68,7 +69,7 @@ async def receive_alert(data: scheams.WebhookData):
     return {"message": "Alert received successfully"}
 
 @app.get("/alert",response_model=List[scheams.RecordAlert])
-async def GetAlerts(page: int =1 ,size: int =10):
+async def GetAlerts(page: int =1 ,size: int =10,current_user: dict = Depends(get_current_user)):
     offset = (page - 1) * size
     # 获取分页数据
     all_alerts = await models.Alert.all().offset(offset).limit(size)
@@ -79,7 +80,7 @@ async def GetAlerts(page: int =1 ,size: int =10):
     
     
 @app.delete("/alert/{id}")
-async def DeleteAlert(id: int):
+async def DeleteAlert(id: int,current_user: dict = Depends(get_current_user)):
     alert = await models.Alert.filter(id=id).first()
     if not alert:
         raise exceptions.HTTPException(status_code=400,detail="用户不存在")
