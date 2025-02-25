@@ -5,6 +5,7 @@ from utils import logs
 from utils.jwt_tool import get_current_user
 import os
 from typing import List
+import math
 
 logger = logs.getLogger(os.environ.get('APP_NAME'))
 
@@ -68,15 +69,26 @@ async def receive_alert(data: scheams.WebhookData):
 
     return {"message": "Alert received successfully"}
 
-@app.get("/alert",response_model=List[scheams.RecordAlert])
+@app.get("/alert")
 async def GetAlerts(page: int =1 ,size: int =10,current_user: dict = Depends(get_current_user)):
     offset = (page - 1) * size
     # 获取分页数据
-    all_alerts = await models.Alert.all().offset(offset).limit(size)
-    for alert in all_alerts:
+    alerts = await models.Alert.all().offset(offset).limit(size)
+    sum = await models.Alert.all().count()
+    for alert in alerts:
         alert.startsAt = alert.startsAt.isoformat() if isinstance(alert.startsAt, datetime) else alert.startsAt
         alert.endsAt = alert.endsAt.isoformat() if isinstance(alert.endsAt, datetime) else alert.endsAt
-    return all_alerts
+        # 返回分页数据和总记录数
+    return {
+        "code": 200,
+        "status": "Success",
+        "err_msg": "查询成功",
+        "total": sum,
+        "s_page": math.ceil(sum / size),
+        "c_page": page,
+        "size": size,
+        "data": alerts
+    }
     
     
 @app.delete("/alert/{id}")

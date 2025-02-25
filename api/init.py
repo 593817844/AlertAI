@@ -8,6 +8,7 @@ from apps.ai.views import app as ai_app
 from apps.users.views import app as user_app
 import settings
 from utils import middleware,exceptions
+from fastapi.middleware.cors import CORSMiddleware
 
 def create_app() -> FastAPI:
     """工厂函数：创建App对象"""
@@ -24,6 +25,15 @@ def create_app() -> FastAPI:
             exceptions.HTTPException: exceptions.global_http_exception_handler,
             exceptions.RequestValidationError: exceptions.global_request_exception_handler,
         }
+    )
+
+    # 允许跨域的来源，可以设置为前端的 URL 地址
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],  # 这里设置为前端地址，如果前端是用 React/Vue 的开发服务器，通常是 http://localhost:3000
+        allow_credentials=True,
+        allow_methods=["*"],  # 允许所有 HTTP 方法
+        allow_headers=["*"],  # 允许所有请求头
     )
 
     # 把tortoise-orm注册到App应用对象中

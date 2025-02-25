@@ -50,18 +50,32 @@ async def get_systeminfo(request: Request, page: int = Query(1, alias='page', ge
     offset = (page - 1) * size
     
     # 获取分页数据
-    users = await models.SystemInfo.all().offset(offset).limit(size)
+    systems = await models.SystemInfo.all().offset(offset).limit(size)
 
     # 获取总记录数
-    total_users = await models.SystemInfo.all().count()
+    sum = await models.SystemInfo.all().count()
 
     # 返回分页数据和总记录数
     return {
         "code": 200,
         "status": "Success",
         "err_msg": "查询成功",
-        "data": users,
-        "total": total_users,
+        "data": systems,
+        "total": sum,
         "page": page,
         "size": size
+    }
+    
+@app.get('/system/getname')
+async def getname():
+    # 获取分页数据
+    namelist=[]
+    systems = await models.SystemInfo.all()
+    for s in systems:
+        namelist.append(s.project)
+    return {
+        "code": 200,
+        "status": "Success",
+        "err_msg": "查询成功",
+        "projects": namelist
     }
