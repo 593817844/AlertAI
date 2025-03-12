@@ -8,8 +8,6 @@
 <img width="974" alt="image" src="https://github.com/user-attachments/assets/56e69130-0988-4503-8b3f-812b576e788e" />
 
 # 三、效果示例
-<img width="1436" alt="20250307134948" src="https://github.com/user-attachments/assets/02be475f-90aa-42b3-8d83-c55b8f5a44b6" />
-<img width="1438" alt="20250307135028" src="https://github.com/user-attachments/assets/48611258-beeb-4671-a879-87ed9cfbad2c" />
 
 # 四、部署
 支持docker-compose，k8s，python脚本部署方式

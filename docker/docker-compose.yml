@@ -22,7 +22,7 @@ services:
     environment:
       MYSQL_DATABASE: 'alert'
       MYSQL_ROOT_PASSWORD: password
-  ruoyi-nginx:
+  twen-nginx:
     container_name: ruoyi-nginx
     image: twen-nginx
     build:
@@ -35,7 +35,7 @@ services:
       - ./nginx/logs:/var/log/nginx
       - ./nginx/conf.d:/etc/nginx/conf.d
     depends_on:
-      - twen-agent
+      - twen-api
   twen-api:
     image: twen-api
     build:
@@ -59,7 +59,7 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      - twen-api
+      - twen-mysql
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080"]  # 健康检查路径，根据你的应用调整
       interval: 30s  # 每 30 秒检查一次
